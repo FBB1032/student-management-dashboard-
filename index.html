@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> <span class="sidebar-text">ABU</span></h2>
+                <button id="toggle-sidebar" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fa-solid fa-chart-line"></i> <span class="sidebar-text">Dashboard</span></a></li>
+                    <li><a href="#students-section"><i class="fa-solid fa-users"></i> <span class="sidebar-text">Students</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="nav-left">
+                    <button id="mobile-menu-btn" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></button>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="nav-right">
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Overview Stats -->
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon users"><i class="fa-solid fa-user-graduate"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Students</h3>
+                            <p id="total-students">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon grades"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-info">
+                            <h3>Average Grade</h3>
+                            <p id="average-grade">0%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon attendance"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3>Avg Attendance</h3>
+                            <p id="average-attendance">0%</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="chart-container">
+                        <h3>Students per Course</h3>
+                        <canvas id="courseChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Students Section -->
+                <section class="students-section" id="students-section">
+                    <div class="section-header">
+                        <h2>Student Management</h2>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="add-student-btn"><i class="fa-solid fa-plus"></i> Add Student</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                            <button class="btn btn-secondary" id="import-btn"><i class="fa-solid fa-file-import"></i> Import</button>
+                            <button class="btn btn-secondary" id="export-btn"><i class="fa-solid fa-file-export"></i> Export</button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar: Search and Filters -->
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search by name or ID...">
+                        </div>
+                        <div class="filters">
+                            <select id="course-filter">
+                                <option value="">All Courses</option>
+                            </select>
+                            <select id="grade-filter">
+                                <option value="">All Grades</option>
+                                <option value="A">Excellent (>=90%)</option>
+                                <option value="B">Good (80-89%)</option>
+                                <option value="C">Average (70-79%)</option>
+                                <option value="D">Poor (<70%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Students Table -->
+                    <div class="table-container">
+                        <table id="students-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="id" class="sortable">ID <i class="fa-solid fa-sort"></i></th>
+                                    <th data-sort="name" class="sortable">Name <i class="fa-solid fa-sort"></i></th>
+                                    <th data-sort="course" class="sortable">Course <i class="fa-solid fa-sort"></i></th>
+                                    <th data-sort="grade" class="sortable">Grade (%) <i class="fa-solid fa-sort"></i></th>
+                                    <th data-sort="attendance" class="sortable">Attendance (%) <i class="fa-solid fa-sort"></i></th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Student Modal -->
+    <div class="modal" id="student-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Student</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="student-form">
+                    <input type="hidden" id="student-internal-id">
+                    <div class="form-group">
+                        <label for="student-id">Student ID*</label>
+                        <input type="text" id="student-id" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-name">Full Name*</label>
+                        <input type="text" id="student-name" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-course">Course*</label>
+                        <input type="text" id="student-course" required list="course-suggestions">
+                        <datalist id="course-suggestions"></datalist>
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="student-grade">Grade (%)*</label>
+                            <input type="number" id="student-grade" min="0" max="100" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        <div class="form-group half">
+                            <label for="student-attendance">Attendance (%)*</label>
+                            <input type="number" id="student-attendance" min="0" max="100" required>
+                            <span class="error-msg"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-modal">Cancel</button>
+                <button class="btn btn-primary" id="save-student">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
